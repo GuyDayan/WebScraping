@@ -7,7 +7,7 @@ public class Main {
     private final MakoRobot makoRobot;
     private WallaRobot wallaRobot;
     private YnetRobot ynetRobot;
-    private BaseRobot [] robots =new BaseRobot[3];
+    private BaseRobot [] robots =new BaseRobot[Definitions.ROBOT_AMOUNT];
 
     public Main() throws Exception {
         this.makoRobot = new MakoRobot();
@@ -53,8 +53,8 @@ public class Main {
         System.out.println("Guess how much times the title appearance (numbers)");
         int guessApps = scanner.nextInt();
         int countApps = this.robots[option].countInArticlesTitles(title);
-        if (Math.abs(countApps-guessApps) <= 2)
-            score+=250;
+        if (Math.abs(countApps-guessApps) <= Definitions.COUNT_GUESS)
+            score+=Definitions.TITLE_GUESS;
         System.out.println("Your final score is " +score);
 
 

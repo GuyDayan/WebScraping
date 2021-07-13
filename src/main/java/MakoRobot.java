@@ -1,5 +1,4 @@
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,7 +24,8 @@ public class MakoRobot extends BaseRobot {
     public Map<String, Integer> getWordsStatistics() throws Exception {
         for (String currentArticle : this.makoLinks){
             String[] articleWords = separateWords(currentArticle);
-            insertToMap(articleWords);
+            if (articleWords.length>0)
+                insertToMap(articleWords);
         }
 
         return this.makoMap;
@@ -58,7 +58,7 @@ public class MakoRobot extends BaseRobot {
             }
             if (sumWords > largest) {
                 largest = sumWords;
-                largestArticleTitle =importMainTitle(currentArticle);
+                largestArticleTitle = importMainTitle(currentArticle);
             }
         }
 
@@ -66,23 +66,25 @@ public class MakoRobot extends BaseRobot {
     }
         public void importLinks() {
         String url = "";
-        Elements subTitles = website.getElementsByClass("mako_main_portlet_container");
+        Element subTitles = website.getElementsByClass("mako_main_portlet_group_container_td side_bar_width").get(0);
+        Elements subElements = subTitles.getElementsByClass("mako_main_portlet_container");
         Elements mainTitles = website.getElementsByClass("teasers");
         Elements mainLinks = mainTitles.get(0).getElementsByTag("h2");
         for (Element element : mainLinks) {
             url= getRootWebsiteUrl() + element.child(0).attributes().get("href");
             this.makoLinks.add(url);
         }
-        for (Element element :subTitles){
-            if (element.childrenSize() > 0){
-                Elements elements1 = element.child(0).getElementsByClass("element").tagName("p");
-                for (Element element1 : elements1){
-                    url = element1.getElementsByTag("a").attr("href");
-                    if (url.length()>0) { //check if empty
-                        url = getRootWebsiteUrl() + url;
-                        this.makoLinks.add(url);
+        for (Element element : subElements){
+            if (element.childrenSize()==1){
+                Elements elements = element.child(0).child(2).getElementsByClass("verticalOuter");
+                if (elements.size()>0){
+                    for (Element element1 : elements){
+                        url=element1.child(0).getElementsByTag("a").attr("href");
+                        if (!url.contains("https")){
+                            url = getRootWebsiteUrl()+url;
+                            this.makoLinks.add(url);
+                        }
                     }
-
                 }
             }
         }
